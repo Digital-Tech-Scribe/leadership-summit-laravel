@@ -71,7 +71,7 @@
                                                 <h5 class="mb-0 me-3">Opening Keynote: The Future of Leadership</h5>
                                                 <span class="badge bg-danger">Keynote</span>
                                             </div>
-                                            <p class="text-muted mb-1">Speaker: Dr. Sarah Johnson</p>
+                                            <p class="text-muted mb-1">Speaker: TBA</p>
                                             <p class="mb-0">Exploring emerging trends and challenges in modern leadership</p>
                                         </div>
                                     </div>
@@ -94,7 +94,7 @@
                                                 <h5 class="mb-0 me-3">Panel Discussion: Digital Transformation in Leadership</h5>
                                                 <span class="badge bg-info">Panel</span>
                                             </div>
-                                            <p class="text-muted mb-1">Moderator: Michael Chen</p>
+                                            <p class="text-muted mb-1">Moderator: TBA</p>
                                             <p class="mb-0">How technology is reshaping leadership practices</p>
                                         </div>
                                     </div>
@@ -117,7 +117,7 @@
                                                 <h5 class="mb-0 me-3">Workshop: Building High-Performance Teams</h5>
                                                 <span class="badge bg-primary">Workshop</span>
                                             </div>
-                                            <p class="text-muted mb-1">Facilitator: Lisa Rodriguez</p>
+                                            <p class="text-muted mb-1">Facilitator: TBA</p>
                                             <p class="mb-0">Interactive session on team dynamics and performance optimization</p>
                                         </div>
                                     </div>

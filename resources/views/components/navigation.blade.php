@@ -9,6 +9,55 @@ $navItems = [
 ];
 @endphp
 
+@push('styles')
+<style>
+    /* Compact navigation spacing */
+    .nav-spaced .nav-item {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .nav-spaced .nav-link {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        font-size: 0.95rem;
+    }
+
+    /* Make admin dropdown more compact */
+    .nav-spaced .dropdown-toggle {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 991.98px) {
+        .nav-spaced .nav-item {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .nav-spaced .nav-link {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+    }
+
+    /* Extra compact for very small screens */
+    @media (max-width: 1200px) {
+        .nav-spaced .nav-link {
+            font-size: 0.9rem;
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+        }
+
+        .nav-spaced .nav-item {
+            margin-left: 0.25rem;
+            margin-right: 0.25rem;
+        }
+    }
+</style>
+@endpush
+
 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 nav-spaced">
     @foreach($navItems as $item)
     <li class="nav-item">
@@ -26,8 +75,7 @@ $navItems = [
         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-user-shield d-lg-none me-2" aria-hidden="true"></i>
-            <span class="d-none d-lg-inline">Admin User</span>
-            <span class="d-lg-none">Admin</span>
+            <span>Admin</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
             <h6 class="dropdown-header text-primary">
