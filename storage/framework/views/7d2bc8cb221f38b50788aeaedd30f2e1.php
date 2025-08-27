@@ -36,6 +36,77 @@
         border: 2px solid #e9ecef;
     }
 
+    /* Icon Selection Styles */
+    .icon-selection-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+
+    .icon-category {
+        margin-bottom: 20px;
+    }
+
+    .category-title {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .icon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .icon-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 10px;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .icon-option:hover {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+    }
+
+    .icon-option.selected {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .icon-option.selected:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+
+    .icon-option i {
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .icon-name {
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+
     .datetime-inputs {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -46,6 +117,53 @@
         .datetime-inputs {
             grid-template-columns: 1fr;
         }
+    }
+
+    .speaker-selection select[multiple] {
+        min-height: 150px;
+    }
+
+    .speaker-selection .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    #host_speaker:disabled {
+        background-color: #f8f9fa;
+        opacity: 0.65;
+    }
+
+    .speaker-selection .form-text.text-warning {
+        color: #f0ad4e !important;
+        font-weight: 500;
+    }
+
+    .speaker-selection .form-text.text-info {
+        color: #5bc0de !important;
+    }
+
+    .speaker-selection .invalid-feedback {
+        display: block;
+    }
+
+    .loading-overlay {
+        position: relative;
+    }
+
+    .loading-overlay::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: none;
+        z-index: 10;
+    }
+
+    .loading-overlay.loading::after {
+        display: block;
     }
 </style>
 <?php $__env->stopPush(); ?>
@@ -232,6 +350,88 @@ unset($__errorArgs, $__bag); ?>
         </div>
     </div>
 
+    <!-- Speaker Assignment -->
+    <div class="form-section speaker-selection">
+        <h3>Speaker Assignment</h3>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="speakers" class="form-label">Select Speakers</label>
+                    <select class="form-select <?php $__errorArgs = ['speakers'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                        id="speakers" name="speakers[]" multiple size="6">
+                        <?php $__empty_1 = true; $__currentLoopData = $speakers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $speaker): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                        <option value="<?php echo e($speaker->id); ?>"
+                            <?php echo e(in_array($speaker->id, old('speakers', $event->speakers->pluck('id')->toArray())) ? 'selected' : ''); ?>>
+                            <?php echo e($speaker->name); ?>
+
+                            <?php if($speaker->position && $speaker->company): ?>
+                            - <?php echo e($speaker->position); ?> at <?php echo e($speaker->company); ?>
+
+                            <?php elseif($speaker->position): ?>
+                            - <?php echo e($speaker->position); ?>
+
+                            <?php elseif($speaker->company): ?>
+                            - <?php echo e($speaker->company); ?>
+
+                            <?php endif; ?>
+                        </option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                        <option disabled>No speakers available - Create speakers first</option>
+                        <?php endif; ?>
+                    </select>
+                    <?php $__errorArgs = ['speakers'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    <div class="form-text">Hold Ctrl (Cmd on Mac) to select multiple speakers</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="host_speaker" class="form-label">Host Speaker</label>
+                    <select class="form-select <?php $__errorArgs = ['host_speaker'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                        id="host_speaker" name="host_speaker">
+                        <option value="">Select host speaker</option>
+                        <!-- Options will be populated dynamically based on selected speakers -->
+                    </select>
+                    <?php $__errorArgs = ['host_speaker'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <div class="invalid-feedback"><?php echo e($message); ?></div>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    <div class="form-text" id="host-speaker-help">Select speakers first to choose a host speaker</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Featured Image -->
     <div class="form-section">
         <h3>Featured Image</h3>
@@ -278,6 +478,57 @@ unset($__errorArgs, $__bag); ?>
             <div>
                 <img id="previewImg" class="image-preview" alt="Image preview">
             </div>
+        </div>
+    </div>
+
+    <!-- Icon Selection -->
+    <div class="form-section">
+        <h3>Event Icon</h3>
+        <p class="text-muted">Select an icon to display when no image is uploaded</p>
+
+        <div class="mb-3">
+            <label class="form-label">Choose Icon</label>
+            <div class="icon-selection-container">
+                <?php
+                $iconsByCategory = App\Helpers\EventIcons::getIconsByCategory();
+                ?>
+
+                <?php $__currentLoopData = $iconsByCategory; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category => $icons): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <div class="icon-category mb-4">
+                    <h6 class="category-title"><?php echo e($category); ?></h6>
+                    <div class="icon-grid">
+                        <?php $__currentLoopData = $icons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $iconClass => $iconData): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div class="icon-option <?php echo e(old('selected_icon', $event->selected_icon) == $iconClass ? 'selected' : ''); ?>"
+                            data-icon="<?php echo e($iconClass); ?>"
+                            title="<?php echo e($iconData['name']); ?> - <?php echo e($iconData['description']); ?>">
+                            <i class="<?php echo e($iconClass); ?>"></i>
+                            <span class="icon-name"><?php echo e($iconData['name']); ?></span>
+                        </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </div>
+
+            <input type="hidden" name="selected_icon" id="selectedIcon" value="<?php echo e(old('selected_icon', $event->selected_icon)); ?>">
+            <?php $__errorArgs = ['selected_icon'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+            <div class="invalid-feedback d-block"><?php echo e($message); ?></div>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <input type="checkbox" name="featured" value="1" <?php echo e(old('featured', $event->featured) ? 'checked' : ''); ?>>
+                Mark as Featured Event
+            </label>
+            <small class="form-text text-muted d-block">Featured events will display with a special "FEATURED" badge</small>
         </div>
     </div>
 
@@ -349,6 +600,9 @@ unset($__errorArgs, $__bag); ?>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>
+<!-- Speaker Selection JavaScript -->
+<script src="<?php echo e(asset('js/admin-speaker-selection.js')); ?>"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Image preview functionality
@@ -370,9 +624,142 @@ unset($__errorArgs, $__bag); ?>
             }
         });
 
-        // Delete confirmation
+        // Icon selection functionality
+        const iconOptions = document.querySelectorAll('.icon-option');
+        const selectedIconInput = document.getElementById('selectedIcon');
+
+        iconOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                iconOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Add selected class to clicked option
+                this.classList.add('selected');
+
+                // Update hidden input value
+                const iconValue = this.getAttribute('data-icon');
+                selectedIconInput.value = iconValue;
+
+                // Visual feedback
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Initialize selection if there's a pre-selected value
+        const currentIcon = selectedIconInput.value;
+        if (currentIcon) {
+            const currentOption = document.querySelector(`[data-icon="${currentIcon}"]`);
+            if (currentOption) {
+                currentOption.classList.add('selected');
+            }
+        }
+
+        // Speaker selection functionality
+        const speakersSelect = document.getElementById('speakers');
+        const hostSpeakerSelect = document.getElementById('host_speaker');
+        const hostSpeakerHelp = document.getElementById('host-speaker-help');
+
+        function updateHostSpeakerOptions() {
+            const selectedSpeakers = Array.from(speakersSelect.selectedOptions);
+            const currentHostSpeaker = hostSpeakerSelect.value;
+
+            // Clear existing options except the first one
+            hostSpeakerSelect.innerHTML = '<option value="">Select host speaker</option>';
+
+            if (selectedSpeakers.length === 0) {
+                hostSpeakerSelect.disabled = true;
+                hostSpeakerHelp.textContent = 'Select speakers first to choose a host speaker';
+                return;
+            }
+
+            hostSpeakerSelect.disabled = false;
+            hostSpeakerHelp.textContent = 'Choose one speaker to be the host speaker';
+
+            // Add options for selected speakers
+            selectedSpeakers.forEach(option => {
+                const hostOption = document.createElement('option');
+                hostOption.value = option.value;
+                hostOption.textContent = option.textContent;
+
+                // Restore previous selection if it's still valid
+                if (option.value === currentHostSpeaker) {
+                    hostOption.selected = true;
+                }
+
+                hostSpeakerSelect.appendChild(hostOption);
+            });
+        }
+
+        // Initialize host speaker dropdown state
+        updateHostSpeakerOptions();
+
+        // Set current host speaker if one exists
+        const currentHostSpeaker = '<?php echo e($event->host_speaker ?? ""); ?>';
+        if (currentHostSpeaker) {
+            hostSpeakerSelect.value = currentHostSpeaker;
+        }
+
+        // Restore host speaker selection if there's an old value
+        const oldHostSpeaker = '<?php echo e(old("host_speaker")); ?>';
+        if (oldHostSpeaker) {
+            hostSpeakerSelect.value = oldHostSpeaker;
+        }
+
+        // Update host speaker options when speakers selection changes
+        speakersSelect.addEventListener('change', updateHostSpeakerOptions);
+
+        // Initialize speaker selection with current data after the component loads
+        setTimeout(() => {
+            if (window.adminSpeakerSelection) {
+                // Set current host speaker if one exists
+                const currentHostSpeaker = '<?php echo e($event->host_speaker ?? ""); ?>';
+                if (currentHostSpeaker) {
+                    window.adminSpeakerSelection.setHostSpeaker(currentHostSpeaker);
+                }
+
+                // Restore host speaker selection if there's an old value (validation errors)
+                const oldHostSpeaker = '<?php echo e(old("host_speaker")); ?>';
+                if (oldHostSpeaker) {
+                    window.adminSpeakerSelection.setHostSpeaker(oldHostSpeaker);
+                }
+
+                // Refresh the component to ensure proper state
+                window.adminSpeakerSelection.refresh();
+            }
+        }, 100);
+
+        // Enhanced form validation with user feedback
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            // Show loading state on form submission
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+                submitButton.disabled = true;
+
+                // Re-enable if form submission is prevented
+                setTimeout(() => {
+                    if (e.defaultPrevented) {
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                    }
+                }, 100);
+            }
+        });
+
+        // Delete confirmation with enhanced UX
         window.confirmDelete = function() {
+            const deleteButton = document.querySelector('button[onclick="confirmDelete()"]');
+
             if (confirm('Are you sure you want to delete this event? This action cannot be undone and will also delete all associated registrations and tickets.')) {
+                if (deleteButton) {
+                    deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+                    deleteButton.disabled = true;
+                }
                 document.getElementById('deleteForm').submit();
             }
         };

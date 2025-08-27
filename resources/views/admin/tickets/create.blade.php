@@ -94,24 +94,12 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="sale_start" class="form-label">Sale Start Date</label>
-                                    <input type="datetime-local" name="sale_start" id="sale_start" class="form-control @error('sale_start') is-invalid @enderror"
-                                        value="{{ old('sale_start') }}">
-                                    <small class="form-text text-muted">Leave empty to start selling immediately</small>
-                                    @error('sale_start')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="sale_end" class="form-label">Sale End Date</label>
                                     <input type="datetime-local" name="sale_end" id="sale_end" class="form-control @error('sale_end') is-invalid @enderror"
                                         value="{{ old('sale_end') }}">
-                                    <small class="form-text text-muted">Leave empty to sell until event starts</small>
+                                    <small class="form-text text-muted">Leave empty to sell until event starts. Tickets are available for purchase immediately upon creation.</small>
                                     @error('sale_end')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

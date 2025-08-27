@@ -1,5 +1,6 @@
 @php
 $navItems = [
+['url' => '/', 'label' => 'Home', 'icon' => 'fas fa-home', 'pattern' => '/'],
 ['url' => '/about', 'label' => 'About', 'icon' => 'fas fa-info-circle', 'pattern' => 'about*'],
 ['url' => '/speakers', 'label' => 'Speakers', 'icon' => 'fas fa-users', 'pattern' => 'speakers*'],
 ['url' => '/events', 'label' => 'Events', 'icon' => 'fas fa-calendar-alt', 'pattern' => 'events*'],
@@ -66,12 +67,7 @@ $navItems = [
             </a>
             <div class="dropdown-divider"></div>
 
-            <!-- Personal Section -->
-            <h6 class="dropdown-header text-muted small">PERSONAL</h6>
-            <a class="dropdown-item" href="{{ route('profile.show') }}">
-                <i class="fas fa-user-edit me-2" aria-hidden="true"></i>Profile
-            </a>
-            <div class="dropdown-divider"></div>
+
 
             <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

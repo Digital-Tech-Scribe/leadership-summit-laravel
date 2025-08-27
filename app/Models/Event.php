@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\ReusableId;
 
 class Event extends Model
 {
-    use HasFactory;
+    use HasFactory, ReusableId;
 
     /**
      * The attributes that are mass assignable.
@@ -22,8 +23,11 @@ class Event extends Model
         'end_date',
         'location',
         'featured_image',
+        'icon',
         'status',
         'is_default',
+        'featured',
+        'selected_icon',
     ];
 
     /**
@@ -35,6 +39,7 @@ class Event extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_default' => 'boolean',
+        'featured' => 'boolean',
     ];
 
     /**
@@ -59,6 +64,39 @@ class Event extends Model
     public function registrations()
     {
         return $this->hasMany(Registration::class);
+    }
+
+    /**
+     * Get the speakers for the event (many-to-many relationship).
+     */
+    public function speakers()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speakers')
+            ->withPivot('is_host')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the designated host speaker for this event.
+     */
+    public function hostSpeaker()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speakers')
+            ->wherePivot('is_host', true)
+            ->withPivot('is_host')
+            ->withTimestamps()
+            ->first();
+    }
+
+    /**
+     * Get non-host speakers for this event.
+     */
+    public function regularSpeakers()
+    {
+        return $this->belongsToMany(Speaker::class, 'event_speakers')
+            ->wherePivot('is_host', false)
+            ->withPivot('is_host')
+            ->withTimestamps();
     }
 
     /**

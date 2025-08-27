@@ -32,7 +32,7 @@ class TicketController extends Controller
             'quantity' => 'required|integer|min:1',
             'max_per_order' => 'nullable|integer|min:1',
             'sale_start' => 'nullable|date',
-            'sale_end' => 'nullable|date|after:sale_start',
+            'sale_end' => 'nullable|date',
             'is_active' => 'boolean'
         ]);
 
@@ -64,7 +64,7 @@ class TicketController extends Controller
             'quantity' => 'required|integer|min:1',
             'max_per_order' => 'nullable|integer|min:1',
             'sale_start' => 'nullable|date',
-            'sale_end' => 'nullable|date|after:sale_start',
+            'sale_end' => 'nullable|date',
             'is_active' => 'boolean'
         ]);
 

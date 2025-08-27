@@ -20,14 +20,39 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("<?php echo e(isset($event) && $event->featured_image ? asset('storage/' . $event->featured_image) : asset('images/default-event-bg.jpg')); ?>") center/cover;
-        opacity: 0.2;
-        z-index: 1;
+        <?php if(isset($event) && $event->featured_image): ?> background: url("<?php echo e(asset('storage/' . $event->featured_image)); ?>") center/cover;
+
+        <?php elseif(isset($event) && $event->selected_icon): ?> background: linear-gradient(135deg, {
+                {
+                $event->featured ? '#ffc107, #ffb300' : 'var(--primary-color), var(--secondary-color)'
+            }
+        });
+    <?php else: ?> background: url("<?php echo e(asset('images/default-event-bg.jpg')); ?>") center/cover;
+    <?php endif; ?> opacity: 0.2;
+    z-index: 1;
     }
 
     .event-hero-content {
         position: relative;
         z-index: 2;
+    }
+
+    .hero-icon-display {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .hero-icon-display i {
+        font-size: 6rem;
+        color: white;
+        opacity: 0.9;
+    }
+
+    .featured-badge {
+        background: #ffc107 !important;
+        color: #000 !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
     }
 
     .event-badge {
@@ -177,6 +202,9 @@
         margin-bottom: 0.5rem;
     }
 
+    /* Event Speakers Section - Now handled by SCSS */
+
+    /* Legacy speakers section (from sessions) */
     .speakers-section {
         background: #f8fafc;
         padding: 4rem 0;
@@ -225,6 +253,14 @@
     .speaker-title {
         color: var(--dark-gray);
         margin-bottom: 1rem;
+    }
+
+    .speaker-bio {
+        color: var(--text-color);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        text-align: left;
     }
 
     .related-events {
@@ -300,10 +336,15 @@
             margin-top: 2rem;
         }
 
+        /* Event Speakers Mobile Styles - Now handled by SCSS */
+
+        /* Legacy speakers grid */
         .speakers-grid {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
     }
+
+    /* Small mobile styles - Now handled by SCSS */
 </style>
 <?php $__env->stopPush(); ?>
 
@@ -312,11 +353,17 @@
 <section class="event-hero">
     <div class="container">
         <div class="event-hero-content">
-            <?php if(isset($event) && $event->status === 'featured'): ?>
-            <span class="event-badge">Featured Event</span>
+            <?php if(isset($event) && !$event->featured_image && $event->selected_icon): ?>
+            <div class="hero-icon-display">
+                <i class="<?php echo e($event->selected_icon); ?>" aria-hidden="true"></i>
+            </div>
             <?php endif; ?>
 
-            <h1 class="event-title"><?php echo e($event->title ?? 'Leadership Excellence Summit'); ?></h1>
+            <?php if(isset($event) && $event->featured): ?>
+            <span class="event-badge featured-badge">FEATURED</span>
+            <?php endif; ?>
+
+            <h1 class="event-title"><?php echo e($event->title); ?></h1>
 
             <div class="event-meta">
                 <div class="event-meta-item">
@@ -329,8 +376,6 @@
                         - <?php echo e($event->end_date->format('F d, Y')); ?>
 
                         <?php endif; ?>
-                        <?php else: ?>
-                        September 15-17, 2025
                         <?php endif; ?>
                     </span>
                 </div>
@@ -344,14 +389,12 @@
                         - <?php echo e($event->end_date->format('g:i A')); ?>
 
                         <?php endif; ?>
-                        <?php else: ?>
-                        9:00 AM - 5:00 PM
                         <?php endif; ?>
                     </span>
                 </div>
                 <div class="event-meta-item">
                     <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                    <span><?php echo e($event->location ?? 'Cypress International Conference Center'); ?></span>
+                    <span><?php echo e($event->location); ?></span>
                 </div>
             </div>
 
@@ -375,6 +418,82 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
+                <!-- Event Speakers Section (moved above description) -->
+                <?php if(isset($event) && $event->speakers && $event->speakers->count() > 0): ?>
+                <div class="event-speakers-inline mb-5">
+                    <h2 class="section-title mb-4">Event Speakers</h2>
+
+                    <?php
+                    $hostSpeaker = $event->hostSpeaker();
+                    $regularSpeakers = $event->regularSpeakers()->get();
+                    ?>
+
+                    <!-- Host Speaker (if designated) -->
+                    <?php if($hostSpeaker): ?>
+                    <div class="host-speaker-container mb-4">
+                        <div class="host-speaker-card">
+                            <div class="host-speaker-badge">
+                                <i class="fas fa-star me-2"></i>HOST SPEAKER
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-md-4 text-center">
+                                    <div class="host-speaker-avatar">
+                                        <?php if($hostSpeaker->photo): ?>
+                                        <img src="<?php echo e(asset('storage/' . $hostSpeaker->photo)); ?>" alt="<?php echo e($hostSpeaker->name); ?>" class="img-fluid rounded-circle">
+                                        <?php else: ?>
+                                        <div class="speaker-placeholder">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h3 class="host-speaker-name"><?php echo e($hostSpeaker->name); ?></h3>
+                                    <?php if($hostSpeaker->position || $hostSpeaker->company): ?>
+                                    <p class="host-speaker-title"><?php echo e($hostSpeaker->position); ?><?php if($hostSpeaker->position && $hostSpeaker->company): ?>, <?php endif; ?><?php echo e($hostSpeaker->company); ?></p>
+                                    <?php endif; ?>
+                                    <?php if($hostSpeaker->bio): ?>
+                                    <p class="host-speaker-bio"><?php echo e(Str::limit($hostSpeaker->bio, 200)); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Regular Speakers Grid -->
+                    <?php if($regularSpeakers && $regularSpeakers->count() > 0): ?>
+                    <div class="regular-speakers-section">
+                        <?php if($hostSpeaker): ?>
+                        <h3 class="mb-4">Guest Speakers</h3>
+                        <?php endif; ?>
+                        <div class="regular-speakers-grid">
+                            <?php $__currentLoopData = $regularSpeakers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $speaker): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="regular-speaker-card">
+                                <div class="regular-speaker-avatar">
+                                    <?php if($speaker->photo): ?>
+                                    <img src="<?php echo e(asset('storage/' . $speaker->photo)); ?>" alt="<?php echo e($speaker->name); ?>" class="img-fluid rounded-circle">
+                                    <?php else: ?>
+                                    <div class="speaker-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <?php endif; ?>
+                                </div>
+                                <h4 class="regular-speaker-name"><?php echo e($speaker->name); ?></h4>
+                                <?php if($speaker->position || $speaker->company): ?>
+                                <p class="regular-speaker-title"><?php echo e($speaker->position); ?><?php if($speaker->position && $speaker->company): ?>, <?php endif; ?><?php echo e($speaker->company); ?></p>
+                                <?php endif; ?>
+                                <?php if($speaker->bio): ?>
+                                <p class="regular-speaker-bio"><?php echo e(Str::limit($speaker->bio, 120)); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
                 <div class="event-description">
                     <?php if(isset($event) && $event->description): ?>
                     <?php echo nl2br(e($event->description)); ?>
@@ -452,26 +571,8 @@
                             </div>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             <?php else: ?>
-                            <!-- Placeholder tickets -->
-                            <div class="ticket-option" data-ticket-id="1">
-                                <div class="ticket-name">General Admission</div>
-                                <div class="ticket-price">$299.00</div>
-                                <div class="ticket-description">Full access to all sessions, workshops, and networking events</div>
-                                <div class="ticket-availability">150 available</div>
-                            </div>
-
-                            <div class="ticket-option" data-ticket-id="2">
-                                <div class="ticket-name">VIP Experience</div>
-                                <div class="ticket-price">$599.00</div>
-                                <div class="ticket-description">Premium seating, exclusive networking events, and meet & greet opportunities</div>
-                                <div class="ticket-availability low">Only 25 available</div>
-                            </div>
-
-                            <div class="ticket-option" data-ticket-id="3">
-                                <div class="ticket-name">Student/Non-Profit</div>
-                                <div class="ticket-price">$99.00</div>
-                                <div class="ticket-description">Discounted rate for students and non-profit organization members</div>
-                                <div class="ticket-availability">50 available</div>
+                            <div class="text-center py-4">
+                                <p class="text-muted">No tickets available for this event.</p>
                             </div>
                             <?php endif; ?>
 
@@ -525,8 +626,10 @@
         </div>
 </section>
 
-<!-- Speakers Section -->
-<?php if(isset($event) && $event->sessions && $event->sessions->count() > 0): ?>
+
+
+<!-- Legacy Speakers Section (from sessions) -->
+<?php if(isset($event) && $event->sessions && $event->sessions->count() > 0 && (!$event->speakers || $event->speakers->count() == 0)): ?>
 <section class="speakers-section">
     <div class="container">
         <h2 class="section-title text-center mb-4">Featured Speakers</h2>
@@ -543,6 +646,9 @@
                 </div>
                 <h3 class="speaker-name"><?php echo e($speaker->name); ?></h3>
                 <p class="speaker-title"><?php echo e($speaker->position); ?><?php if($speaker->company): ?>, <?php echo e($speaker->company); ?><?php endif; ?></p>
+                <?php if($speaker->bio): ?>
+                <p class="speaker-bio"><?php echo e(Str::limit($speaker->bio, 100)); ?></p>
+                <?php endif; ?>
                 <a href="<?php echo e(url('/speakers/' . $speaker->id)); ?>" class="btn btn-outline-primary btn-sm">
                     View Profile
                 </a>
@@ -554,44 +660,7 @@
 </section>
 <?php endif; ?>
 
-<!-- Related Events -->
-<section class="related-events">
-    <div class="container">
-        <h2 class="section-title text-center mb-4">You Might Also Like</h2>
-        <div class="related-events-grid">
-            <!-- Placeholder related events -->
-            <div class="related-event-card">
-                <h3 class="h5 mb-2">Executive Leadership Workshop</h3>
-                <p class="text-muted mb-2">
-                    <i class="fas fa-calendar me-1" aria-hidden="true"></i>
-                    September 19, 2025
-                </p>
-                <p class="mb-3">Intensive one-day workshop for senior executives focusing on strategic leadership.</p>
-                <a href="#" class="btn btn-outline-primary btn-sm">Learn More</a>
-            </div>
 
-            <div class="related-event-card">
-                <h3 class="h5 mb-2">Innovation Leadership Masterclass</h3>
-                <p class="text-muted mb-2">
-                    <i class="fas fa-calendar me-1" aria-hidden="true"></i>
-                    October 5, 2025
-                </p>
-                <p class="mb-3">Master the art of leading innovation and driving organizational transformation.</p>
-                <a href="#" class="btn btn-outline-primary btn-sm">Learn More</a>
-            </div>
-
-            <div class="related-event-card">
-                <h3 class="h5 mb-2">Women in Leadership Summit</h3>
-                <p class="text-muted mb-2">
-                    <i class="fas fa-calendar me-1" aria-hidden="true"></i>
-                    October 20, 2025
-                </p>
-                <p class="mb-3">Empowering women leaders to break barriers and drive meaningful change.</p>
-                <a href="#" class="btn btn-outline-primary btn-sm">Learn More</a>
-            </div>
-        </div>
-    </div>
-</section>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('scripts'); ?>

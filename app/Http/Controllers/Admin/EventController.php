@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\Speaker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -27,7 +28,8 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('admin.events.create');
+        $speakers = Speaker::orderBy('name')->get();
+        return view('admin.events.create', compact('speakers'));
     }
 
     /**
@@ -44,7 +46,21 @@ class EventController extends Controller
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published,cancelled',
             'is_default' => 'boolean',
+            'featured' => 'boolean',
+            'selected_icon' => 'nullable|string',
+            'speakers' => 'nullable|array',
+            'speakers.*' => 'exists:speakers,id',
+            'host_speaker' => 'nullable|exists:speakers,id',
         ]);
+
+        // Custom validation: ensure host speaker is in speakers array
+        if ($request->filled('host_speaker') && $request->filled('speakers')) {
+            if (!in_array($request->host_speaker, $request->speakers)) {
+                return back()->withErrors([
+                    'host_speaker' => 'Host speaker must be selected from the assigned speakers.'
+                ])->withInput();
+            }
+        }
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->title);
@@ -55,6 +71,9 @@ class EventController extends Controller
         }
 
         $event = Event::create($data);
+
+        // Handle speaker assignments
+        $this->handleSpeakerAssignments($event, $request);
 
         // Set as default if requested
         if ($request->is_default) {
@@ -79,7 +98,9 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
-        return view('admin.events.edit', compact('event'));
+        $speakers = Speaker::orderBy('name')->get();
+        $event->load('speakers');
+        return view('admin.events.edit', compact('event', 'speakers'));
     }
 
     /**
@@ -96,7 +117,21 @@ class EventController extends Controller
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published,cancelled',
             'is_default' => 'boolean',
+            'featured' => 'boolean',
+            'selected_icon' => 'nullable|string',
+            'speakers' => 'nullable|array',
+            'speakers.*' => 'exists:speakers,id',
+            'host_speaker' => 'nullable|exists:speakers,id',
         ]);
+
+        // Custom validation: ensure host speaker is in speakers array
+        if ($request->filled('host_speaker') && $request->filled('speakers')) {
+            if (!in_array($request->host_speaker, $request->speakers)) {
+                return back()->withErrors([
+                    'host_speaker' => 'Host speaker must be selected from the assigned speakers.'
+                ])->withInput();
+            }
+        }
 
         $data = $request->all();
         $data['slug'] = Str::slug($request->title);
@@ -111,6 +146,9 @@ class EventController extends Controller
         }
 
         $event->update($data);
+
+        // Handle speaker assignments
+        $this->handleSpeakerAssignments($event, $request);
 
         // Set as default if requested
         if ($request->is_default) {
@@ -152,5 +190,43 @@ class EventController extends Controller
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Event set as default successfully.');
+    }
+
+    /**
+     * Handle speaker assignments for an event.
+     *
+     * @param Event $event
+     * @param Request $request
+     * @return void
+     */
+    private function handleSpeakerAssignments(Event $event, Request $request)
+    {
+        // Check if speakers field is present in the request
+        if ($request->has('speakers')) {
+            if ($request->filled('speakers')) {
+                // Assign speakers with host designation
+                $speakerData = [];
+                foreach ($request->speakers as $speakerId) {
+                    $speakerData[$speakerId] = [
+                        'is_host' => $request->filled('host_speaker') && $request->host_speaker == $speakerId
+                    ];
+                }
+                $event->speakers()->sync($speakerData);
+            } else {
+                // Clear all speaker assignments if speakers array is empty
+                $event->speakers()->detach();
+            }
+        } elseif ($request->filled('speakers')) {
+            // Handle case where speakers is filled but not an array (edge case)
+            $speakerData = [];
+            $speakers = is_array($request->speakers) ? $request->speakers : [$request->speakers];
+
+            foreach ($speakers as $speakerId) {
+                $speakerData[$speakerId] = [
+                    'is_host' => $request->filled('host_speaker') && $request->host_speaker == $speakerId
+                ];
+            }
+            $event->speakers()->sync($speakerData);
+        }
     }
 }

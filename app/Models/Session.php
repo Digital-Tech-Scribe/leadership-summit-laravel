@@ -14,7 +14,7 @@ class Session extends Model
      *
      * @var string
      */
-    protected $table = 'event_sessions';
+    protected $table = 'sessions';
 
     /**
      * The attributes that are mass assignable.

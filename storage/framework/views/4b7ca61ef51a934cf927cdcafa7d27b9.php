@@ -89,32 +89,8 @@
         </div>
     </div>
 
-    <!-- Skip Navigation Links -->
-    <div class="skip-links">
-        <a class="skip-link screen-reader-text" href="#primary">Skip to main content</a>
-        <a class="skip-link screen-reader-text" href="#masthead">Skip to navigation</a>
-        <a class="skip-link screen-reader-text" href="#colophon">Skip to footer</a>
-    </div>
-
     <div id="page" class="site">
         <?php echo $__env->make('components.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-
-        <!-- Breadcrumb Navigation -->
-        <?php if(!request()->is('/') && !request()->is('events/*')): ?>
-        <nav aria-label="Breadcrumb" class="breadcrumb-nav">
-            <div class="container">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="<?php echo e(url('/')); ?>">
-                            <i class="fas fa-home" aria-hidden="true"></i>
-                            <span class="visually-hidden">Home</span>
-                        </a>
-                    </li>
-                    <?php echo $__env->yieldContent('breadcrumbs'); ?>
-                </ol>
-            </div>
-        </nav>
-        <?php endif; ?>
 
         <main id="primary" class="site-main" role="main">
             <!-- Flash Messages -->

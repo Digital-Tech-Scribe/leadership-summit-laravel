@@ -145,6 +145,16 @@
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
 
+    /* Featured Event Styling */
+    .event-card.featured-event {
+        border: 2px solid #ffc107;
+        box-shadow: 0 4px 20px rgba(255, 193, 7, 0.2);
+    }
+
+    .event-card.featured-event:hover {
+        box-shadow: 0 8px 30px rgba(255, 193, 7, 0.3);
+    }
+
     .event-image {
         height: 200px;
         background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
@@ -167,6 +177,31 @@
         font-size: 0.8rem;
         font-weight: 600;
         text-transform: uppercase;
+        z-index: 10;
+    }
+
+    .featured-badge {
+        background: #ffc107 !important;
+        color: #000 !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.4);
+    }
+
+    /* Event Icon Display */
+    .event-icon-display {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        font-size: 4rem;
+    }
+
+    .featured-event .event-icon-display {
+        background: linear-gradient(135deg, #ffc107, #ffb300);
+        color: #000;
     }
 
     .event-content {
@@ -368,19 +403,25 @@
         @if(isset($events) && $events->count() > 0)
         <div class="events-grid" id="defaultEventsGrid">
             @foreach($events as $event)
-            <article class="event-card">
+            <article class="event-card {{ $event->featured ? 'featured-event' : '' }}">
                 <div class="event-image">
                     @if($event->featured_image)
                     <img src="{{ asset('storage/' . $event->featured_image) }}" alt="{{ $event->title }}"
                         class="w-100 h-100" style="object-fit: cover;">
+                    @elseif($event->selected_icon)
+                    <div class="event-icon-display">
+                        <i class="{{ $event->selected_icon }}" aria-hidden="true"></i>
+                    </div>
                     @else
-                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    <div class="event-icon-display">
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    </div>
                     @endif
 
-                    @if($event->status === 'featured')
-                    <span class="event-badge">Featured</span>
+                    @if($event->featured)
+                    <span class="event-badge featured-badge">FEATURED</span>
                     @elseif($event->tickets && $event->tickets->where('available', '>', 0)->count() === 0)
-                    <span class="event-badge" style="background: #ef4444;">Sold Out</span>
+                    <span class="event-badge sold-out-badge">SOLD OUT</span>
                     @endif
                 </div>
 
@@ -708,10 +749,13 @@
                 filteredEvents.forEach((event, index) => {
                     console.log(`📝 [Events Search] Rendering event ${index + 1}: "${event.title}"`);
                     eventsHTML += `
-                    <article class="event-card search-transition-enter">
+                    <article class="event-card search-transition-enter ${event.featured ? 'featured-event' : ''}">
                         <div class="event-image">
-                            <i class="${event.icon}" aria-hidden="true"></i>
-                            ${event.featured ? '<span class="event-badge">Featured</span>' : ''}
+                            ${event.featured_image ? 
+                                `<img src="${event.featured_image}" alt="${event.title}" class="w-100 h-100" style="object-fit: cover;">` :
+                                `<div class="event-icon-display"><i class="${event.selected_icon || 'fas fa-calendar-alt'}" aria-hidden="true"></i></div>`
+                            }
+                            ${event.featured ? '<span class="event-badge featured-badge">FEATURED</span>' : ''}
                         </div>
                         <div class="event-content">
                             <div class="event-meta">

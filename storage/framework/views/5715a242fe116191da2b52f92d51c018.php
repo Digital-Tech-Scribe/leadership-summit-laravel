@@ -9,7 +9,7 @@ $navItems = [
 ];
 ?>
 
-<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+<ul class="navbar-nav ms-auto mb-2 mb-lg-0 nav-spaced">
     <?php $__currentLoopData = $navItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <li class="nav-item">
         <a class="nav-link <?php echo e(request()->is($item['pattern']) ? 'active' : ''); ?>"
@@ -23,37 +23,55 @@ $navItems = [
 
     <?php if(auth()->guard()->check()): ?>
     <?php if(auth()->user()->role && auth()->user()->role->name === 'admin'): ?>
-    <li class="nav-item">
-        <a class="nav-link <?php echo e(request()->is('admin*') ? 'active' : ''); ?>"
-            href="<?php echo e(url('/admin')); ?>"
-            <?php if(request()->is('admin*')): ?> aria-current="page" <?php endif; ?>>
-            <i class="fas fa-cog d-lg-none me-2" aria-hidden="true"></i>Admin
-        </a>
-    </li>
-    <?php endif; ?>
     <li class="nav-item dropdown">
         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-user d-lg-none me-2" aria-hidden="true"></i>
-            <span class="d-none d-lg-inline"><?php echo e(Auth::user()->name); ?></span>
-            <span class="d-lg-none">Account</span>
+            <i class="fas fa-user-shield d-lg-none me-2" aria-hidden="true"></i>
+            <span class="d-none d-lg-inline">Admin User</span>
+            <span class="d-lg-none">Admin</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <h6 class="dropdown-header"><?php echo e(Auth::user()->name); ?></h6>
-            <a class="dropdown-item" href="<?php echo e(url('/dashboard')); ?>">
-                <i class="fas fa-tachometer-alt me-2" aria-hidden="true"></i>Dashboard
+            <h6 class="dropdown-header text-primary">
+                <i class="fas fa-crown me-1"></i><?php echo e(Auth::user()->name); ?>
+
+            </h6>
+            <div class="dropdown-divider"></div>
+
+            <!-- Admin Dashboard Section -->
+            <h6 class="dropdown-header text-muted small">ADMIN DASHBOARD</h6>
+            <a class="dropdown-item" href="<?php echo e(url('/admin')); ?>">
+                <i class="fas fa-tachometer-alt me-2 text-primary" aria-hidden="true"></i>Dashboard
             </a>
-            <a class="dropdown-item" href="<?php echo e(route('profile.show')); ?>">
-                <i class="fas fa-user-edit me-2" aria-hidden="true"></i>Profile
+            <a class="dropdown-item" href="<?php echo e(route('admin.events.create')); ?>">
+                <i class="fas fa-plus-circle me-2 text-success" aria-hidden="true"></i>Add Event
             </a>
-            <a class="dropdown-item" href="<?php echo e(route('registrations.index')); ?>">
-                <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i>My Registrations
-            </a>
-            <a class="dropdown-item" href="<?php echo e(route('orders.index')); ?>">
-                <i class="fas fa-shopping-cart me-2" aria-hidden="true"></i>My Orders
+            <a class="dropdown-item" href="<?php echo e(route('admin.speakers.create')); ?>">
+                <i class="fas fa-user-plus me-2 text-info" aria-hidden="true"></i>Add Speaker
             </a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="<?php echo e(route('logout')); ?>"
+
+            <!-- Admin Management Section -->
+            <h6 class="dropdown-header text-muted small">MANAGEMENT</h6>
+            <a class="dropdown-item" href="<?php echo e(route('admin.events.index')); ?>">
+                <i class="fas fa-calendar-alt me-2" aria-hidden="true"></i>All Events
+            </a>
+            <a class="dropdown-item" href="<?php echo e(route('admin.speakers.index')); ?>">
+                <i class="fas fa-users me-2" aria-hidden="true"></i>All Speakers
+            </a>
+            <a class="dropdown-item" href="<?php echo e(route('admin.registrations.index')); ?>">
+                <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i>Registrations
+            </a>
+            <a class="dropdown-item" href="<?php echo e(route('admin.payments.pending')); ?>">
+                <i class="fas fa-credit-card me-2" aria-hidden="true"></i>Payments
+            </a>
+            <a class="dropdown-item" href="<?php echo e(route('admin.users.index')); ?>">
+                <i class="fas fa-users-cog me-2" aria-hidden="true"></i>Users
+            </a>
+            <div class="dropdown-divider"></div>
+
+
+
+            <a class="dropdown-item text-danger" href="<?php echo e(route('logout')); ?>"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>Logout
             </a>
@@ -62,7 +80,6 @@ $navItems = [
             </form>
         </div>
     </li>
-    <?php else: ?>
-    <!-- No login/register links for regular users - they should use event registration -->
+    <?php endif; ?>
     <?php endif; ?>
 </ul><?php /**PATH /Users/Apple/Desktop/dev_folder/Dev_project/test.kiro2/leadership-summit-laravel/resources/views/components/navigation.blade.php ENDPATH**/ ?>
