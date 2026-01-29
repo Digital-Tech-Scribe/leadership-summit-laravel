@@ -39,6 +39,7 @@ yarn-error.log
 deploy*.sh
 test*.sh
 *.sh
+!build.sh
 nginx*.txt
 nginx*.conf
 
