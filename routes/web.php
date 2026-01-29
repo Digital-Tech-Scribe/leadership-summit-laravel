@@ -19,7 +19,8 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('home');
+    $featuredEvents = \App\Models\Event::getFeaturedEvents();
+    return view('home', compact('featuredEvents'));
 })->name('home');
 
 // Admin-only authentication routes (no public registration)
@@ -192,6 +193,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Event Management
     Route::resource('events', App\Http\Controllers\Admin\EventController::class);
     Route::post('/events/{event}/set-default', [App\Http\Controllers\Admin\EventController::class, 'setDefault'])->name('events.set-default');
+    Route::post('/events/{event}/toggle-featured', [App\Http\Controllers\Admin\EventController::class, 'toggleFeatured'])->name('events.toggle-featured');
 
     // Speaker Management
     Route::resource('speakers', App\Http\Controllers\Admin\SpeakerController::class);

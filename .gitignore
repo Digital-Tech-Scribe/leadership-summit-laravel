@@ -5,8 +5,8 @@
 /storage/*.key
 /vendor
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -15,4 +15,44 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
-/.vscode.env.*
+/.vscode
+.env.*
+
+# System files
+.DS_Store
+*.DS_Store
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+
+# Test results and logs
+/storage/unipayment-test-results
+/storage/test-results
+*.log
+
+# Deployment and build files
+*.zip
+*.tar.gz
+*.pkg
+deploy*.sh
+test*.sh
+*.sh
+nginx*.txt
+nginx*.conf
+
+# Development artifacts
+/scripts
+/.backup
+/.cleanup-backup
+/unipayment-tests
+/payment-service
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+
+# Kiro development files
+/.kiro

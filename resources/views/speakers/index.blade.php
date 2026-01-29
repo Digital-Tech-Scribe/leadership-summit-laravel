@@ -59,8 +59,8 @@
             @foreach($speakers as $speaker)
             <article class="speaker-card">
                 <div class="speaker-image">
-                    @if($speaker->image)
-                    <img src="{{ asset('storage/' . $speaker->image) }}" alt="{{ $speaker->name }}" class="img-fluid">
+                    @if($speaker->photo)
+                    <img src="{{ asset('storage/' . $speaker->photo) }}" alt="{{ $speaker->name }}" class="img-fluid">
                     @else
                     <i class="fas fa-user" aria-hidden="true"></i>
                     @endif

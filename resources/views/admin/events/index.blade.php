@@ -26,6 +26,15 @@
     @endif
 
     <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Events List</h5>
+                <div class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Maximum 4 events can be featured. Default event is always featured.
+                </div>
+            </div>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -36,6 +45,7 @@
                             <th>Location</th>
                             <th>Status</th>
                             <th>Default</th>
+                            <th>Featured</th>
                             <th>Registrations</th>
                             <th>Actions</th>
                         </tr>
@@ -70,6 +80,20 @@
                                 </form>
                                 @endif
                             </td>
+                            <td>
+                                @if($event->featured)
+                                <span class="badge bg-success">Featured</span>
+                                <form method="POST" action="{{ route('admin.events.toggle-featured', $event) }}" class="d-inline mt-1">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Remove</button>
+                                </form>
+                                @else
+                                <form method="POST" action="{{ route('admin.events.toggle-featured', $event) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Set Featured</button>
+                                </form>
+                                @endif
+                            </td>
                             <td>{{ $event->registrations_count }}</td>
                             <td>
                                 <div class="btn-group" role="group">
@@ -94,7 +118,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center">No events found.</td>
+                            <td colspan="8" class="text-center">No events found.</td>
                         </tr>
                         @endforelse
                     </tbody>

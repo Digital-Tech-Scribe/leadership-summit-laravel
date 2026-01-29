@@ -193,6 +193,28 @@ class EventController extends Controller
     }
 
     /**
+     * Toggle featured status for an event
+     */
+    public function toggleFeatured(Event $event)
+    {
+        try {
+            if ($event->featured) {
+                $event->removeFeatured();
+                $message = 'Event removed from featured events successfully.';
+            } else {
+                $event->setAsFeatured();
+                $message = 'Event set as featured successfully.';
+            }
+
+            return redirect()->route('admin.events.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.events.index')
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    /**
      * Handle speaker assignments for an event.
      *
      * @param Event $event

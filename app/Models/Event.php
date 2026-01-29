@@ -123,7 +123,51 @@ class Event extends Model
         // Remove default status from all other events
         self::where('is_default', true)->update(['is_default' => false]);
 
-        // Set this event as default
-        $this->update(['is_default' => true]);
+        // Set this event as default and featured
+        $this->update([
+            'is_default' => true,
+            'featured' => true
+        ]);
+    }
+
+    /**
+     * Get featured events (max 4).
+     */
+    public static function getFeaturedEvents()
+    {
+        return self::where('featured', true)
+            ->where('status', 'published')
+            ->orderByRaw('is_default DESC') // Default event first
+            ->orderBy('start_date', 'asc')
+            ->limit(4)
+            ->get();
+    }
+
+    /**
+     * Set this event as featured.
+     */
+    public function setAsFeatured()
+    {
+        // Check if we already have 4 featured events
+        $featuredCount = self::where('featured', true)->count();
+
+        if ($featuredCount >= 4 && !$this->featured) {
+            throw new \Exception('Maximum of 4 events can be featured at once.');
+        }
+
+        $this->update(['featured' => true]);
+    }
+
+    /**
+     * Remove featured status from this event.
+     */
+    public function removeFeatured()
+    {
+        // Don't allow removing featured status from default event
+        if ($this->is_default) {
+            throw new \Exception('Cannot remove featured status from the default event.');
+        }
+
+        $this->update(['featured' => false]);
     }
 }
